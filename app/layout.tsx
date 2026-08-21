@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@/shared/components/theme-provider"
+import { AppProviders } from "@/shared/providers/app-providers"
 import { cn } from "@/shared/lib/utils"
 import { Inter, JetBrains_Mono, Noto_Serif } from "next/font/google"
 import "./globals.css"
@@ -31,7 +31,7 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )

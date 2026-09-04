@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/utils"
 import { useRender } from "@base-ui/react"
+import { cn } from "cn"
 
 type ContainerProps<T extends React.ElementType = "div"> =
   useRender.ComponentProps<T>

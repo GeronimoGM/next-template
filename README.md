@@ -6,21 +6,21 @@ ready out of the box.
 
 ## Tech stack
 
-| Area            | Tool                                                              |
-| --------------- | ----------------------------------------------------------------- |
-| Framework       | Next.js 16 (App Router, `cacheComponents`/PPR, typed routes)       |
-| UI runtime      | React 19 with React Compiler enabled                               |
-| Styling         | Tailwind CSS v4 (CSS-first config) + `tw-animate-css`              |
-| Components      | shadcn/ui (`base-nova` style) on top of Base UI                    |
-| Icons           | Tabler Icons                                                       |
-| Forms           | React Hook Form + `@hookform/resolvers` validating with zod        |
-| Theming         | `next-themes` (class-based dark mode)                              |
-| Fonts           | Inter, Noto Serif and JetBrains Mono via `next/font/google`        |
-| Language        | TypeScript (strict)                                                |
-| Unit testing    | Vitest 4 + Testing Library (jsdom)                                 |
-| E2E testing     | Playwright (Chromium)                                              |
-| Lint/format     | ESLint 9 flat config + Prettier                                    |
-| Package manager | pnpm                                                               |
+| Area            | Tool                                                         |
+| --------------- | ------------------------------------------------------------ |
+| Framework       | Next.js 16 (App Router, `cacheComponents`/PPR, typed routes) |
+| UI runtime      | React 19 with React Compiler enabled                         |
+| Styling         | Tailwind CSS v4 (CSS-first config) + `tw-animate-css`        |
+| Components      | shadcn/ui (`base-nova` style) on top of Base UI              |
+| Icons           | Tabler Icons                                                 |
+| Forms           | React Hook Form + `@hookform/resolvers` validating with zod  |
+| Theming         | `next-themes` (class-based dark mode)                        |
+| Fonts           | Inter, Noto Serif and JetBrains Mono via `next/font/google`  |
+| Language        | TypeScript (strict)                                          |
+| Unit testing    | Vitest 4 + Testing Library (jsdom)                           |
+| E2E testing     | Playwright (Chromium)                                        |
+| Lint/format     | ESLint 9 flat config + Prettier                              |
+| Package manager | pnpm                                                         |
 
 ## Getting started
 
@@ -79,26 +79,28 @@ to it: never import another feature's `lib/`.
 
 ### Anatomy of a feature
 
-| Folder        | Holds                                                        |
-| ------------- | ------------------------------------------------------------ |
-| `components/` | UI of the domain                                             |
-| `hooks/`      | Hooks of the domain                                          |
-| `lib/`        | Private helpers (same feature only)                          |
-| `schemas/`    | zod schemas, shared by forms and server functions            |
-| `server/`     | Server functions, one per file with a descriptive name       |
-| `types.ts`    | Interfaces and types of the domain                           |
+| Folder        | Holds                                                  |
+| ------------- | ------------------------------------------------------ |
+| `components/` | UI of the domain                                       |
+| `hooks/`      | Hooks of the domain                                    |
+| `lib/`        | Private helpers (same feature only)                    |
+| `schemas/`    | zod schemas, shared by forms and server functions      |
+| `server/`     | Server functions, one per file with a descriptive name |
+| `types.ts`    | Interfaces and types of the domain                     |
 
 Tests live next to their source as `*.test.ts(x)`.
 
 ### Server functions
 
 Each function (or cohesive piece of logic) gets its own file in
-`features/<name>/server/`. Each file imports `server-only`, validates
-input with `../schemas` and is never imported from a Client Component.
-Read functions use `"use cache"` so they work with `cacheComponents`;
-writes use `"use server"`. Next.js itself imposes no file organization
-here — one-function-per-file is this template's convention to keep
-`server/` screaming what it does.
+`features/<name>/server/`. Each file imports `server-only` (if it's only
+callable from the server) and validates input with `../schemas`.
+Read functions use `"use cache"` so they work with `cacheComponents` and
+are called from Server Components; writes use `"use server"` and may be
+imported directly by Client Components (event handlers, `useActionState`)
+or passed down as props. Next.js itself imposes no file organization here
+— one-function-per-file is this template's convention to keep `server/`
+screaming what it does.
 
 ### Shared code and types
 
@@ -114,19 +116,19 @@ own rows.
 
 ## Scripts
 
-| Command             | Description                          |
-| ------------------- | ------------------------------------ |
-| `pnpm dev`          | Start the development server         |
-| `pnpm build`        | Production build                     |
-| `pnpm start`        | Serve the production build           |
-| `pnpm lint`         | ESLint                               |
-| `pnpm format`       | Prettier                             |
-| `pnpm typecheck`    | `tsc --noEmit`                       |
-| `pnpm test`         | Vitest unit tests                    |
-| `pnpm test:watch`   | Vitest in watch mode                 |
-| `pnpm test:coverage`| Vitest with v8 coverage              |
-| `pnpm test:e2e`     | Playwright end-to-end tests          |
-| `pnpm test:e2e:ui`  | Playwright UI mode                   |
+| Command              | Description                  |
+| -------------------- | ---------------------------- |
+| `pnpm dev`           | Start the development server |
+| `pnpm build`         | Production build             |
+| `pnpm start`         | Serve the production build   |
+| `pnpm lint`          | ESLint                       |
+| `pnpm format`        | Prettier                     |
+| `pnpm typecheck`     | `tsc --noEmit`               |
+| `pnpm test`          | Vitest unit tests            |
+| `pnpm test:watch`    | Vitest in watch mode         |
+| `pnpm test:coverage` | Vitest with v8 coverage      |
+| `pnpm test:e2e`      | Playwright end-to-end tests  |
+| `pnpm test:e2e:ui`   | Playwright UI mode           |
 
 ## Styling & theming
 
@@ -160,21 +162,21 @@ polymorphic through its `render` prop:
 ```tsx
 import { Container } from "@/shared/components/container"
 
-<Container render={<section />}>{children}</Container>
+;<Container render={<section />}>{children}</Container>
 ```
 
 ## Optional features
 
 Not included by default. Add only when you need them:
 
-| Package                                          | What it is                                   | Add it when                                              |
-| ------------------------------------------------ | -------------------------------------------- | -------------------------------------------------------- |
-| TanStack Query                                   | Client server-state cache and sync           | You fetch on the client and need caching/dedup/retries   |
-| [nuqs](https://nuqs.47ng.com)                    | Type-safe URL search params as React state   | Filters, pagination or sorting must live in the URL      |
-| [date-fns](https://date-fns.org)                 | Date parsing, formatting and manipulation    | You display or compute dates beyond `toLocaleDateString` |
-| [better-auth](https://www.better-auth.com)       | Authentication with sessions and providers   | You need signup, login or session handling               |
-| [openapi-typescript](https://openapi-ts.dev)     | TypeScript types generated from OpenAPI      | You consume an OpenAPI backend and want typed clients    |
-| [motion](https://motion.dev)                     | Animations, transitions and gestures         | You need animation beyond CSS transitions                |
+| Package                                      | What it is                                 | Add it when                                              |
+| -------------------------------------------- | ------------------------------------------ | -------------------------------------------------------- |
+| TanStack Query                               | Client server-state cache and sync         | You fetch on the client and need caching/dedup/retries   |
+| [nuqs](https://nuqs.47ng.com)                | Type-safe URL search params as React state | Filters, pagination or sorting must live in the URL      |
+| [date-fns](https://date-fns.org)             | Date parsing, formatting and manipulation  | You display or compute dates beyond `toLocaleDateString` |
+| [better-auth](https://www.better-auth.com)   | Authentication with sessions and providers | You need signup, login or session handling               |
+| [openapi-typescript](https://openapi-ts.dev) | TypeScript types generated from OpenAPI    | You consume an OpenAPI backend and want typed clients    |
+| [motion](https://motion.dev)                 | Animations, transitions and gestures       | You need animation beyond CSS transitions                |
 
 ## Forms
 

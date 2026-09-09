@@ -1,4 +1,5 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -66,8 +67,11 @@ Alias: `@/*` → project root.
   feature's `lib/`.
 - A feature holds `components/`, `hooks/`, `lib/`, `schemas/`, `types.ts`
   and `server/`. Each server function lives in its own descriptively named
-  file, imports `server-only`, validates input with `../schemas` and is
-  never imported from a Client Component.
+  file, imports `server-only` (if it's only callable from the server)
+  and validates input with `../schemas`. `"use server"` actions may be imported
+  by Client Components (event handlers, `useActionState`); `"use cache"`
+  reads are for Server Components only — a client needing the data receives
+  it as props or calls an action.
 - Imports between features are allowed. No import cycles: if A↔B depend on
   each other, the shared part moves to `shared/`.
 - Tailwind v4 has no config file. Theme tokens live in `app/globals.css`

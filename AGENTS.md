@@ -13,9 +13,9 @@ and gotchas that are not obvious from the code.
 ## Stack
 
 Next.js 16 (App Router) · React 19 + React Compiler · TypeScript strict ·
-Tailwind CSS v4 · shadcn/ui (base-nova, Base UI) · TanStack Query v5 ·
-React Hook Form + @hookform/resolvers + zod v4 · next-themes · Vitest 4 +
-Testing Library · Playwright. Package manager: **pnpm only**.
+Tailwind CSS v4 · shadcn/ui (base-nova, Base UI) · React Hook Form +
+@hookform/resolvers + zod v4 · next-themes · Vitest 4 + Testing Library ·
+Playwright. Package manager: **pnpm only**.
 
 ## Commands
 
@@ -39,7 +39,6 @@ app/                  # Routes only. layout.tsx wires fonts + <AppProviders>
 shared/
   components/ui/      # shadcn primitives (add via npx shadcn@latest add X)
   components/         # Shared components (e.g. container.tsx)
-  lib/tanstack-query/ # get-query-client.ts, prefetch-queries.ts (server-only)
   providers/          # app-providers.tsx composes ALL providers
 e2e/                  # Playwright specs only
 ```
@@ -49,14 +48,9 @@ Alias: `@/*` → project root.
 ## Hard rules
 
 - `cacheComponents` is ON. Any uncached data fetch in a Server Component
-  must sit inside a `<Suspense>` boundary or the build fails. For TanStack
-  Query SSR use the pattern in README ("Server-side prefetching"):
-  `prefetchQueries(...)` + `<HydrationBoundary>`.
+  must sit inside a `<Suspense>` boundary or the build fails.
 - React Compiler is ON. Do not add manual `useMemo` / `useCallback` /
   `React.memo` unless there is a measured problem.
-- Never instantiate `QueryClient` in components. Use `getQueryClient()`;
-  server-side prefetching goes through `prefetchQueries()` from
-  `shared/lib/tanstack-query/prefetch-queries.ts` (`server-only` guarded).
 - New global providers go in `shared/providers/app-providers.tsx`, never
   directly in `app/layout.tsx`.
 - Tailwind v4 has no config file. Theme tokens live in `app/globals.css`
@@ -91,4 +85,3 @@ Alias: `@/*` → project root.
 
 - Framework behavior: bundled docs at `node_modules/next/dist/docs/`
   (version-specific — trust these over memory).
-- TanStack Query SSR: https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr

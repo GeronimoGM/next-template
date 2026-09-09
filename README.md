@@ -1,8 +1,8 @@
 # Next.js Template
 
 Opinionated [Next.js](https://nextjs.org) template: App Router, React 19,
-Tailwind CSS v4, shadcn/ui, TanStack Query, React Hook Form + zod, and unit /
-E2E testing ready out of the box.
+Tailwind CSS v4, shadcn/ui, React Hook Form + zod, and unit / E2E testing
+ready out of the box.
 
 ## Tech stack
 
@@ -13,7 +13,6 @@ E2E testing ready out of the box.
 | Styling         | Tailwind CSS v4 (CSS-first config) + `tw-animate-css`              |
 | Components      | shadcn/ui (`base-nova` style) on top of Base UI                    |
 | Icons           | Tabler Icons                                                       |
-| Server state    | TanStack Query v5 (+ devtools in development)                      |
 | Forms           | React Hook Form + `@hookform/resolvers` validating with zod        |
 | Theming         | `next-themes` (class-based dark mode)                              |
 | Fonts           | Inter, Noto Serif and JetBrains Mono via `next/font/google`        |
@@ -43,15 +42,8 @@ shared/
   components/
     ui/               #   shadcn/ui primitives
     container.tsx     #   Polymorphic layout wrapper (Base UI useRender)
-  lib/
-    utils.ts          #   cn() class merger
-    tanstack-query/
-      get-query-client.ts    # QueryClient factory (singleton per request/tab)
-      prefetch-queries.ts    # Server-only prefetch + dehydrate helper
   providers/
     app-providers.tsx        # Composes all app providers in one component
-    query-provider.tsx       # QueryClientProvider + devtools (dev only)
-    query-devtools.tsx       # Dynamic import, client-only
     theme-provider.tsx       # next-themes wrapper + dark mode hotkey (d)
 e2e/                  # Playwright specs
 ```
@@ -109,55 +101,18 @@ import { Container } from "@/shared/components/container"
 <Container render={<section />}>{children}</Container>
 ```
 
-## Data fetching with TanStack Query
+## Optional features
 
-A `QueryClientProvider` is already set up in `shared/providers/query-provider.tsx`
-(singleton per request on the server, singleton per tab on the browser).
-Global defaults: `staleTime` of 60s and no retries on HTTP 4xx errors.
+Not included by default. Add only when you need them:
 
-### Client-side fetching
-
-Use `useQuery`, `useMutation`, etc. from `@tanstack/react-query` directly in
-Client Components.
-
-### Server-side prefetching (SSR + hydration)
-
-From a Server Component, prefetch queries with the `prefetchQueries` helper and
-pass the dehydrated state to `<HydrationBoundary>`. The content must be wrapped
-in a `<Suspense>` boundary because this template enables `cacheComponents`:
-uncached data fetching outside of Suspense breaks the build.
-
-```tsx
-// app/posts/page.tsx (Server Component)
-import { HydrationBoundary } from "@tanstack/react-query"
-import { Suspense } from "react"
-import { prefetchQueries } from "@/shared/lib/tanstack-query/prefetch-queries"
-
-async function Posts() {
-  const state = await prefetchQueries([
-    { queryKey: ["posts"], queryFn: getPosts },
-  ])
-
-  return (
-    <HydrationBoundary state={state}>
-      {/* Client Component using useQuery({ queryKey: ["posts"], ... }) */}
-    </HydrationBoundary>
-  )
-}
-
-export default function PostsPage() {
-  return (
-    <Suspense fallback={<p>Loading…</p>}>
-      <Posts />
-    </Suspense>
-  )
-}
-```
-
-The query key must match between the prefetch and the client-side `useQuery`.
-With hydrated data present, the client does not refetch on mount.
-
-Reference: [TanStack Query — Advanced SSR](https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr).
+| Package                                          | What it is                                   | Add it when                                              |
+| ------------------------------------------------ | -------------------------------------------- | -------------------------------------------------------- |
+| TanStack Query                                   | Client server-state cache and sync           | You fetch on the client and need caching/dedup/retries   |
+| [nuqs](https://nuqs.47ng.com)                    | Type-safe URL search params as React state   | Filters, pagination or sorting must live in the URL      |
+| [date-fns](https://date-fns.org)                 | Date parsing, formatting and manipulation    | You display or compute dates beyond `toLocaleDateString` |
+| [better-auth](https://www.better-auth.com)       | Authentication with sessions and providers   | You need signup, login or session handling               |
+| [openapi-typescript](https://openapi-ts.dev)     | TypeScript types generated from OpenAPI      | You consume an OpenAPI backend and want typed clients    |
+| [motion](https://motion.dev)                     | Animations, transitions and gestures         | You need animation beyond CSS transitions                |
 
 ## Forms
 

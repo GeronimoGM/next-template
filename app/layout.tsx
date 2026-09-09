@@ -1,5 +1,5 @@
 import { AppProviders } from "@/shared/providers/app-providers"
-import { cn } from "@/shared/lib/utils"
+import { cn } from "cn"
 import { Inter, JetBrains_Mono, Noto_Serif } from "next/font/google"
 import "./globals.css"
 

@@ -35,11 +35,15 @@ route, run `rm -rf .next` and retry.
 ## Project map
 
 ```
-app/                  # Routes only. layout.tsx wires fonts + <AppProviders>
+app/                  # Routes only: compose features inside <Suspense>, no logic
+features/
+  <name>/             # components/ hooks/ lib/ schemas/ server/ types.ts + tests
 shared/
   components/ui/      # shadcn primitives (add via npx shadcn@latest add X)
-  components/         # Shared components (e.g. container.tsx)
+  components/         # Innate or promoted (used by 2+ features)
+  hooks/              # Innate or promoted (used by 2+ features)
   providers/          # app-providers.tsx composes ALL providers
+  types/              # Shared/generated types (e.g. Supabase database.ts)
 e2e/                  # Playwright specs only
 ```
 
@@ -53,6 +57,19 @@ Alias: `@/*` → project root.
   `React.memo` unless there is a measured problem.
 - New global providers go in `shared/providers/app-providers.tsx`, never
   directly in `app/layout.tsx`.
+- Where code goes: domain code → `features/<name>/`; used by 2+ features or
+  featureless → `shared/`. When in doubt
+  start in `features/` and promote to `shared/` on the second real use
+  (move, never duplicate).
+- No top-level `lib/`, `utils/`, `helpers/`, `common/` or `misc/`. `lib/`
+  exists only inside a feature and is private to it: never import another
+  feature's `lib/`.
+- A feature holds `components/`, `hooks/`, `lib/`, `schemas/`, `types.ts`
+  and `server/`. Each server function lives in its own descriptively named
+  file, imports `server-only`, validates input with `../schemas` and is
+  never imported from a Client Component.
+- Imports between features are allowed. No import cycles: if A↔B depend on
+  each other, the shared part moves to `shared/`.
 - Tailwind v4 has no config file. Theme tokens live in `app/globals.css`
   (`@theme`). Semantic spacing utilities are available (`p-md`, `gap-lg`,
   `py-xl`, ...). Class order is enforced by prettier-plugin-tailwindcss.
@@ -79,7 +96,7 @@ Alias: `@/*` → project root.
   exist there. Co-locate specs as `*.test.tsx` next to the source.
 - E2E (Playwright): put specs in `e2e/` only. The config auto-starts the
   server (`pnpm dev` locally, build+start on CI) at `localhost:3000`.
-- Coverage is v8, scoped to `app/**` and `shared/**`.
+- Coverage is v8, scoped to `app/**`, `features/**` and `shared/**`.
 
 ## Reference docs
 

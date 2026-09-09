@@ -34,21 +34,83 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Project structure
 
 ```
-app/                  # Routes (App Router)
+app/                  # Routes (App Router): compose features, no logic
   layout.tsx          #   Root layout: fonts + AppProviders
   page.tsx            #   Home page
   globals.css         #   Tailwind v4 entry + design tokens
-shared/
+features/             # One folder per domain (see Architecture below)
+  <name>/
+    components/       #   UI of the domain
+    hooks/            #   Hooks of the domain
+    lib/              #   Private helpers (never import from another feature)
+    schemas/          #   zod schemas (forms and server share them)
+    server/           #   One file per server function, descriptive name
+    types.ts          #   Types of the domain
+shared/               # Code with no feature: innate or promoted on second use
   components/
     ui/               #   shadcn/ui primitives
     container.tsx     #   Polymorphic layout wrapper (Base UI useRender)
+  hooks/
   providers/
     app-providers.tsx        # Composes all app providers in one component
     theme-provider.tsx       # next-themes wrapper + dark mode hotkey (d)
+  types/                     # Shared/generated types (e.g. Supabase database.ts)
 e2e/                  # Playwright specs
 ```
 
 Path alias: `@/*` maps to the project root.
+
+## Architecture
+
+Screaming architecture: domain code lives in `features/<name>/`, so the
+folder tree names what the product does. `app/` only composes routes and
+`shared/` only holds code that belongs to no feature.
+
+### Deciding where code goes
+
+1. Belongs to a domain (posts, billing, auth)? → `features/<domain>/...`
+2. Used by 2+ features, or a shared/generated type? → `shared/...`
+3. Unsure? Start in `features/` and promote to `shared/` when a second
+   feature needs it: move the file, never duplicate it.
+
+There is no top-level `lib/`, `utils/` or `helpers/` — generic folders
+become junk drawers. `lib/` exists only inside a feature and is private
+to it: never import another feature's `lib/`.
+
+### Anatomy of a feature
+
+| Folder        | Holds                                                        |
+| ------------- | ------------------------------------------------------------ |
+| `components/` | UI of the domain                                             |
+| `hooks/`      | Hooks of the domain                                          |
+| `lib/`        | Private helpers (same feature only)                          |
+| `schemas/`    | zod schemas, shared by forms and server functions            |
+| `server/`     | Server functions, one per file with a descriptive name       |
+| `types.ts`    | Interfaces and types of the domain                           |
+
+Tests live next to their source as `*.test.ts(x)`.
+
+### Server functions
+
+Each function (or cohesive piece of logic) gets its own file in
+`features/<name>/server/`. Each file imports `server-only`, validates
+input with `../schemas` and is never imported from a Client Component.
+Read functions use `"use cache"` so they work with `cacheComponents`;
+writes use `"use server"`. Next.js itself imposes no file organization
+here — one-function-per-file is this template's convention to keep
+`server/` screaming what it does.
+
+### Shared code and types
+
+`shared/` code arrives two ways: **innate** (never belonged to a feature:
+shadcn primitives, `Container`, providers) or
+**promoted** (born in a feature, moved when a second one needed it).
+
+Types follow the same split: domain types live in
+`features/<name>/types.ts`; shared or generated types live in
+`shared/types/` — e.g. a Supabase project's generated `database.ts`
+goes there, and features import from it instead of each defining their
+own rows.
 
 ## Scripts
 
@@ -156,7 +218,7 @@ export function ContactForm() {
   scrolling).
 - Files: `**/*.{test,spec}.{ts,tsx}` anywhere outside `node_modules`, `.next`,
   `e2e`.
-- Coverage via v8, scoped to `app/` and `shared/`.
+- Coverage via v8, scoped to `app/`, `features/` and `shared/`.
 
 ```tsx
 import { render, screen } from "@testing-library/react"

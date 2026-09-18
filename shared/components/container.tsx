@@ -13,7 +13,10 @@ export function Container<T extends React.ElementType = "div">({
     render,
     props: {
       ...props,
-      className: cn("mx-auto max-w-7xl px-md sm:px-lg lg:px-xl", className),
+      className: cn(
+        "mx-auto w-full max-w-7xl px-md sm:px-lg lg:px-xl",
+        className
+      ),
     },
   })
 }

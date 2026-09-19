@@ -9,7 +9,9 @@ export default function IndexPage() {
           <h1 className="font-medium">Project ready!</h1>
           <p>You may now add components and start building.</p>
           <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-xs">Button</Button>
+          <div className="mt-xs">
+            <Button>Button</Button>
+          </div>
         </div>
         <div className="font-mono text-xs text-muted-foreground">
           (Press <kbd>d</kbd> to toggle dark mode)
